@@ -5,7 +5,7 @@ import 'package:irpan_gallery/pages/login_pages.dart';
 import 'package:image_picker/image_picker.dart';
 import '../helpers/database_helper.dart';
 import 'favorites_page.dart';
-import 'login_pages.dart'; // Import halaman LoginPage
+import 'login_pages.dart';
 
 class GalleryPage extends StatefulWidget {
   const GalleryPage({Key? key}) : super(key: key);
@@ -46,18 +46,19 @@ class _GalleryPageState extends State<GalleryPage> {
       _groupedImages = groupedImages;
     });
   }
-
+  
   Future<void> _pickImage() async {
-    final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles != null && pickedFiles.isNotEmpty) {
-      for (var pickedFile in pickedFiles) {
-        final imageFile = File(pickedFile.path);
-        final date = DateTime.now();
-        await DatabaseHelper.instance.insertImage(imageFile, date);
-        _loadImages();
-      }
+  final pickedFiles = await _picker.pickMultiImage();
+  if (pickedFiles != null && pickedFiles.isNotEmpty) {
+    for (var pickedFile in pickedFiles) {
+      final imageFile = File(pickedFile.path);
+      final date = DateTime.now();
+      await DatabaseHelper.instance.insertImage(imageFile, date);
+      _loadImages(); // Perbarui tampilan galeri setelah menambahkan gambar
     }
   }
+}
+
 
   Future<void> _toggleFavorite(int id, int currentStatus) async {
     await DatabaseHelper.instance.toggleFavorite(id, currentStatus);
@@ -132,14 +133,19 @@ class _GalleryPageState extends State<GalleryPage> {
                     ),
                   ),
                   Wrap(
-                    spacing: 8.0, // Horizontal space between images
-                    runSpacing: 8.0, // Vertical space between rows
+                    spacing: 8.0,
+                    runSpacing: 8.0,
                     children: _groupedImages[date]!.map((imageData) {
                       final imageBytes = imageData['image'] as List<int>;
+                      final dateAdded = DateTime.parse(imageData['date']);
+                      final formattedDate =
+                          '${dateAdded.day}/${dateAdded.month}/${dateAdded.year}';
                       final imageWidget = Image.memory(
                         Uint8List.fromList(imageBytes),
                         fit: BoxFit.cover,
                       );
+
+                      double imageSize = (MediaQuery.of(context).size.width - 40) / 4;
 
                       return GestureDetector(
                         onTap: () {
@@ -155,11 +161,19 @@ class _GalleryPageState extends State<GalleryPage> {
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      imageWidget,
+                                      Image.memory(Uint8List.fromList(imageBytes)),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        "Foto ditambahkan pada $formattedDate",
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
                                       const SizedBox(height: 8),
                                       Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: [
                                           IconButton(
                                             icon: Icon(
@@ -171,8 +185,7 @@ class _GalleryPageState extends State<GalleryPage> {
                                                   : Colors.grey,
                                             ),
                                             onPressed: () {
-                                              _toggleFavorite(imageData['id'],
-                                                  imageData['favorite']);
+                                              _toggleFavorite(imageData['id'], imageData['favorite']);
                                               Navigator.of(context).pop();
                                             },
                                           ),
@@ -182,30 +195,23 @@ class _GalleryPageState extends State<GalleryPage> {
                                                 context: context,
                                                 builder: (context) {
                                                   return AlertDialog(
-                                                    title: const Text(
-                                                        'Hapus Gambar'),
+                                                    title: const Text('Hapus Gambar'),
                                                     content: const Text(
                                                         'Apakah Anda yakin ingin menghapus gambar ini?'),
                                                     actions: [
                                                       TextButton(
                                                         onPressed: () {
-                                                          _deleteImage(
-                                                              imageData['id']);
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                          Navigator.of(context)
-                                                              .pop();
+                                                          _deleteImage(imageData['id']);
+                                                          Navigator.of(context).pop();
+                                                          Navigator.of(context).pop();
                                                         },
-                                                        child:
-                                                            const Text('Ya'),
+                                                        child: const Text('Ya'),
                                                       ),
                                                       TextButton(
                                                         onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop();
+                                                          Navigator.of(context).pop();
                                                         },
-                                                        child:
-                                                            const Text('Tidak'),
+                                                        child: const Text('Tidak'),
                                                       ),
                                                     ],
                                                   );
@@ -226,10 +232,8 @@ class _GalleryPageState extends State<GalleryPage> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: Container(
-                            constraints: BoxConstraints(
-                              maxWidth: (MediaQuery.of(context).size.width - 32 - 16) / 3,  // Width adjusted for 3 images per row
-                              maxHeight: (MediaQuery.of(context).size.width - 32 - 16) / 3, // Set height same as width to make square
-                            ),
+                            width: imageSize,
+                            height: imageSize,
                             decoration: BoxDecoration(
                               color: _isDarkMode ? Colors.grey[800] : Colors.grey[300],
                               borderRadius: BorderRadius.circular(8),

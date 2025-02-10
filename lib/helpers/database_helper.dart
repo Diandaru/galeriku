@@ -48,6 +48,17 @@ class DatabaseHelper {
       ''');
     }
   }
+  //Fungsi ini akan menghapus satu baris dari tabel berdasarkan id
+ Future<int> removeFromFavorites(int id) async {
+  final db = await database;
+  return await db.delete(
+    'favorites', // Sesuaikan dengan nama tabel favorit di database
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+}
+
+
 
 // Menyimpan gambar dalam bentuk byte array dengan informasi tambahan (tanggal, status favorit).
   Future<int> insertImage(File imageFile, DateTime date) async {

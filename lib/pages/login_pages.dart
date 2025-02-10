@@ -11,6 +11,9 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FocusNode _usernameFocus = FocusNode(); // Fokus untuk username
+  final FocusNode _passwordFocus = FocusNode(); // Fokus untuk password
+  bool _isPasswordVisible = false; // Status visibilitas password
 
   // Simulasi data akun statis
   final List<Map<String, String>> _accounts = [
@@ -48,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFF8E2DE2), // Ubah warna menjadi lebih soft
+                  Color(0xFF8E2DE2),
                   Color(0xFF4A00E0),
                 ],
                 begin: Alignment.topCenter,
@@ -76,13 +79,14 @@ class _LoginPageState extends State<LoginPage> {
                           style: TextStyle(
                             fontSize: 28.0,
                             fontWeight: FontWeight.w600,
-                            color: Colors.deepPurple.shade700, // Warna judul yang lebih menarik
+                            color: Colors.deepPurple.shade700,
                           ),
                         ),
                         const SizedBox(height: 24.0),
                         // Input username
                         TextField(
                           controller: _usernameController,
+                          focusNode: _usernameFocus, // Gunakan FocusNode
                           decoration: InputDecoration(
                             labelText: 'Username',
                             prefixIcon: const Icon(Icons.person),
@@ -90,14 +94,19 @@ class _LoginPageState extends State<LoginPage> {
                               borderRadius: BorderRadius.circular(12.0),
                             ),
                             filled: true,
-                            fillColor: Colors.white.withOpacity(0.8), // Warna latar belakang input
+                            fillColor: Colors.white.withOpacity(0.8),
                           ),
+                          textInputAction: TextInputAction.next, // Enter pindah ke password
+                          onSubmitted: (value) {
+                            FocusScope.of(context).requestFocus(_passwordFocus);
+                          },
                         ),
                         const SizedBox(height: 16.0),
-                        // Input password
+                        // Input password dengan ikon mata
                         TextField(
                           controller: _passwordController,
-                          obscureText: true,
+                          focusNode: _passwordFocus, // Gunakan FocusNode
+                          obscureText: !_isPasswordVisible,
                           decoration: InputDecoration(
                             labelText: 'Password',
                             prefixIcon: const Icon(Icons.lock),
@@ -105,8 +114,21 @@ class _LoginPageState extends State<LoginPage> {
                               borderRadius: BorderRadius.circular(12.0),
                             ),
                             filled: true,
-                            fillColor: Colors.white.withOpacity(0.8), // Warna latar belakang input
+                            fillColor: Colors.white.withOpacity(0.8),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isPasswordVisible = !_isPasswordVisible;
+                                });
+                              },
+                            ),
                           ),
+                          onSubmitted: (value) => _login(), // Enter langsung login
                         ),
                         const SizedBox(height: 24.0),
                         // Tombol login
@@ -120,8 +142,8 @@ class _LoginPageState extends State<LoginPage> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.0),
                             ),
-                            backgroundColor: Colors.deepPurple.shade600, // Ubah warna tombol agar serasi
-                            foregroundColor: Colors.white, // Warna teks menjadi putih
+                            backgroundColor: Colors.deepPurple.shade600,
+                            foregroundColor: Colors.white,
                           ),
                           child: const Text(
                             'Login',
