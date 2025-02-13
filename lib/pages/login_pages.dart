@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'gallery_page.dart'; // Pastikan Anda telah membuat halaman GalleryPage
+import 'gallery_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -11,23 +11,20 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final FocusNode _usernameFocus = FocusNode(); // Fokus untuk username
-  final FocusNode _passwordFocus = FocusNode(); // Fokus untuk password
-  bool _isPasswordVisible = false; // Status visibilitas password
+  final FocusNode _usernameFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
+  bool _isPasswordVisible = false;
 
-  // Simulasi data akun statis
   final List<Map<String, String>> _accounts = [
     {'username': 'irfan', 'password': 'D1andaru'},
   ];
 
-  // Login statis
   void _login() {
     String username = _usernameController.text;
     String password = _passwordController.text;
 
-    bool isValidUser = _accounts.any((account) {
-      return account['username'] == username && account['password'] == password;
-    });
+    bool isValidUser = _accounts.any((account) =>
+        account['username'] == username && account['password'] == password);
 
     if (isValidUser) {
       Navigator.pushReplacement(
@@ -36,7 +33,10 @@ class _LoginPageState extends State<LoginPage> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Username atau Password salah!')),
+        SnackBar(
+          content: const Text('Username atau Password salah!'),
+          backgroundColor: Colors.redAccent,
+        ),
       );
     }
   }
@@ -46,14 +46,10 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Latar belakang gradien
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Color(0xFF8E2DE2),
-                  Color(0xFF4A00E0),
-                ],
+                colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -62,50 +58,51 @@ class _LoginPageState extends State<LoginPage> {
           Center(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(20.0),
                 child: Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16.0),
                   ),
-                  elevation: 8.0,
+                  elevation: 10.0,
+                  shadowColor: Colors.black26,
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Judul halaman
+                        const Icon(
+                          Icons.lock_outline,
+                          size: 80.0,
+                          color: Colors.deepPurple,
+                        ),
+                        const SizedBox(height: 16.0),
                         Text(
-                          'Login',
+                          'Welcome to the Gallery App',
                           style: TextStyle(
-                            fontSize: 28.0,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.deepPurple.shade700,
+                            fontSize: 26.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple.shade800,
                           ),
                         ),
-                        const SizedBox(height: 24.0),
-                        // Input username
+                        const SizedBox(height: 20.0),
                         TextField(
                           controller: _usernameController,
-                          focusNode: _usernameFocus, // Gunakan FocusNode
+                          focusNode: _usernameFocus,
                           decoration: InputDecoration(
                             labelText: 'Username',
                             prefixIcon: const Icon(Icons.person),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12.0),
                             ),
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.8),
                           ),
-                          textInputAction: TextInputAction.next, // Enter pindah ke password
-                          onSubmitted: (value) {
-                            FocusScope.of(context).requestFocus(_passwordFocus);
-                          },
+                          textInputAction: TextInputAction.next,
+                          onSubmitted: (_) =>
+                              FocusScope.of(context).requestFocus(_passwordFocus),
                         ),
                         const SizedBox(height: 16.0),
-                        // Input password dengan ikon mata
                         TextField(
                           controller: _passwordController,
-                          focusNode: _passwordFocus, // Gunakan FocusNode
+                          focusNode: _passwordFocus,
                           obscureText: !_isPasswordVisible,
                           decoration: InputDecoration(
                             labelText: 'Password',
@@ -113,8 +110,6 @@ class _LoginPageState extends State<LoginPage> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12.0),
                             ),
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.8),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _isPasswordVisible
@@ -128,26 +123,28 @@ class _LoginPageState extends State<LoginPage> {
                               },
                             ),
                           ),
-                          onSubmitted: (value) => _login(), // Enter langsung login
+                          onSubmitted: (_) => _login(),
                         ),
                         const SizedBox(height: 24.0),
-                        // Tombol login
-                        ElevatedButton(
-                          onPressed: _login,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 14.0,
-                              horizontal: 32.0,
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _login,
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14.0,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              backgroundColor: Colors.deepPurple.shade700,
+                              foregroundColor: Colors.white,
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.0),
+                            child: const Text(
+                              'Login',
+                              style:
+                                  TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
                             ),
-                            backgroundColor: Colors.deepPurple.shade600,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text(
-                            'Login',
-                            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
                           ),
                         ),
                       ],
